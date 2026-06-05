@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Душа в душу</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Экраны онбординга -->
+  <section id="screen-onboarding-1" class="screen">
+    <div class="onboarding-container">
+      <div class="onboarding-emoji">✨</div>
+      <h1>Не просто фото</h1>
+      <p>Мы находим людей, с которыми ты совместим по-настоящему — по нумерологии, астрологии, психотипу и ещё 6 системам</p>
+      <div class="dots"><span class="dot active"></span><span class="dot"></span><span class="dot"></span></div>
+      <button class="btn-primary" id="btn-onb1-next">Дальше →</button>
+    </div>
+  </section>
+
+  <section id="screen-onboarding-2" class="screen hidden">
+    <div class="onboarding-container">
+      <div class="onboarding-emoji">🔮</div>
+      <h1>Как это работает</h1>
+      <p>Ты вводишь дату рождения и проходишь короткие тесты. Алгоритм считает совместимость и объясняет, почему именно этот человек — твой</p>
+      <div class="dots"><span class="dot"></span><span class="dot active"></span><span class="dot"></span></div>
+      <button class="btn-primary" id="btn-onb2-next">Дальше →</button>
+    </div>
+  </section>
+
+  <section id="screen-onboarding-3" class="screen hidden">
+    <div class="onboarding-container">
+      <div class="onboarding-emoji">💫</div>
+      <h1>Тысячи нашли свою половину</h1>
+      <div class="couples-counter" id="couples-counter">0 пар нашли друг друга</div>
+      <p class="privacy-note">
+        Нажимая «Начать», ты соглашаешься с
+        <a href="#" id="privacy-link">политикой конфиденциальности</a>
+        и обработкой персональных данных согласно 152-ФЗ.
+      </p>
+      <div class="dots"><span class="dot"></span><span class="dot"></span><span class="dot active"></span></div>
+      <button class="btn-primary" id="btn-onb3-start">Найти своего человека 💫</button>
+    </div>
+  </section>
+
+  <!-- Шаг 1 регистрации: фото + имя + о себе -->
+  <section id="screen-reg-1" class="screen hidden">
+    <div class="reg-container">
+      <div class="progress-bar">
+        <div class="progress-fill" style="width: 25%"></div>
+      </div>
+      <div class="step-label">Шаг 1 из 4</div>
+      <h2>Расскажи о себе</h2>
+
+      <div class="photo-upload" id="photo-upload-area">
+        <div class="photo-placeholder" id="photo-placeholder">
+          <span>📷</span>
+          <span>Добавить фото</span>
+          <span class="photo-hint">Первое фото — чёткое лицо, без очков и группы</span>
+        </div>
+        <div class="photos-grid" id="photos-grid"></div>
+        <input type="file" id="photo-input" accept="image/*" multiple style="display:none">
+      </div>
+
+      <label class="field-label">Псевдоним (имя в приложении)</label>
+      <input type="text" id="reg1-name" class="input-field" placeholder="Как тебя зовут?" maxlength="100">
+
+      <label class="field-label">О себе <span class="hint">что сказали бы о тебе близкие друзья?</span></label>
+      <textarea id="reg1-about" class="input-field textarea" placeholder="Пара предложений о том, кто ты..." maxlength="200"></textarea>
+      <div class="char-count"><span id="reg1-about-count">0</span>/200</div>
+
+      <button class="btn-primary" id="btn-reg1-next">Далее →</button>
+    </div>
+  </section>
+
+  <!-- Шаг 2: пол, ориентация, возраст, город, предпочтения -->
+  <section id="screen-reg-2" class="screen hidden">
+    <div class="reg-container">
+      <div class="progress-bar">
+        <div class="progress-fill" style="width: 50%"></div>
+      </div>
+      <div class="step-label">Шаг 2 из 4</div>
+      <h2>Основное</h2>
+
+      <label class="field-label">Я</label>
+      <div class="radio-group" id="reg2-gender">
+        <button class="radio-btn" data-value="female">Женщина</button>
+        <button class="radio-btn" data-value="male">Мужчина</button>
+        <button class="radio-btn" data-value="other">Другое</button>
+      </div>
+
+      <label class="field-label">Ориентация</label>
+      <div class="radio-group" id="reg2-orientation">
+        <button class="radio-btn" data-value="hetero">Гетеро</button>
+        <button class="radio-btn" data-value="bi">Би</button>
+        <button class="radio-btn" data-value="homo">ЛГБТ+</button>
+      </div>
+
+      <label class="field-label">Возраст</label>
+      <input type="number" id="reg2-age" class="input-field" placeholder="Сколько лет?" min="18" max="99">
+
+      <label class="field-label">Город проживания</label>
+      <input type="text" id="reg2-city" class="input-field" placeholder="Москва, Санкт-Петербург...">
+
+      <label class="field-label">Ищу</label>
+      <div class="radio-group" id="reg2-pref-gender">
+        <button class="radio-btn" data-value="female">Женщину</button>
+        <button class="radio-btn" data-value="male">Мужчину</button>
+        <button class="radio-btn" data-value="any">Любого</button>
+      </div>
+
+      <label class="field-label">Возраст партнёра</label>
+      <div class="range-row">
+        <input type="number" id="reg2-age-min" class="input-field input-small" placeholder="от" min="18" max="99" value="18">
+        <span>—</span>
+        <input type="number" id="reg2-age-max" class="input-field input-small" placeholder="до" min="18" max="99" value="60">
+      </div>
+
+      <label class="field-label">Тип отношений</label>
+      <div class="radio-group" id="reg2-relation-type">
+        <button class="radio-btn" data-value="serious">Серьёзные</button>
+        <button class="radio-btn" data-value="open">Открытые</button>
+        <button class="radio-btn" data-value="unsure">Пока не знаю</button>
+      </div>
+
+      <div class="nav-row">
+        <button class="btn-secondary" id="btn-reg2-back">← Назад</button>
+        <button class="btn-primary" id="btn-reg2-next">Далее →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Шаг 3: дата рождения + расчёты -->
+  <section id="screen-reg-3" class="screen hidden">
+    <div class="reg-container">
+      <div class="progress-bar">
+        <div class="progress-fill" style="width: 75%"></div>
+      </div>
+      <div class="step-label">Шаг 3 из 4</div>
+      <h2>Дата рождения</h2>
+      <p class="step-desc">Нужна для расчёта нумерологии, астрологии и Дизайна Человека</p>
+
+      <label class="field-label">Дата рождения</label>
+      <input type="text" id="reg3-birthdate" class="input-field input-large" placeholder="ДД.ММ.ГГГГ" maxlength="10">
+
+      <label class="field-label">Время рождения <span class="optional-tag">необязательно</span></label>
+      <input type="text" id="reg3-birthtime" class="input-field" placeholder="14:30 (если знаете — расчёты точнее)">
+
+      <label class="field-label">Город рождения <span class="optional-tag">необязательно</span></label>
+      <input type="text" id="reg3-birthcity" class="input-field" placeholder="Москва, Казань...">
+
+      <div id="reg3-results" class="calc-results hidden">
+        <div class="calc-result-title">✨ Рассчитано автоматически:</div>
+        <div class="calc-chips" id="reg3-chips"></div>
+      </div>
+
+      <div class="nav-row">
+        <button class="btn-secondary" id="btn-reg3-back">← Назад</button>
+        <button class="btn-primary" id="btn-reg3-next">Далее →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Шаг 4: жёсткие фильтры -->
+  <section id="screen-reg-4" class="screen hidden">
+    <div class="reg-container">
+      <div class="progress-bar">
+        <div class="progress-fill" style="width: 100%"></div>
+      </div>
+      <div class="step-label">Шаг 4 из 4</div>
+      <h2>Принципиальные вещи</h2>
+      <p class="step-desc">Это не просто пожелания — люди с противоположными ответами не будут показываться друг другу</p>
+
+      <label class="field-label">Дети</label>
+      <div class="radio-group column" id="reg4-children">
+        <button class="radio-btn" data-value="want">Хочу детей</button>
+        <button class="radio-btn" data-value="dont_want">Не хочу детей</button>
+        <button class="radio-btn" data-value="have_want_more">Есть, хочу ещё</button>
+        <button class="radio-btn" data-value="have_no_more">Есть, больше не хочу</button>
+        <button class="radio-btn" data-value="any">Всё равно</button>
+      </div>
+
+      <label class="field-label">Отношение к браку</label>
+      <div class="radio-group column" id="reg4-marriage">
+        <button class="radio-btn" data-value="want">Хочу официальный брак</button>
+        <button class="radio-btn" data-value="not_rushing">Не тороплюсь</button>
+        <button class="radio-btn" data-value="no">Не планирую</button>
+        <button class="radio-btn" data-value="was">Уже был(а) в браке</button>
+      </div>
+
+      <label class="field-label">Моя религия</label>
+      <div class="radio-group" id="reg4-religion-own">
+        <button class="radio-btn" data-value="christian">Христианство</button>
+        <button class="radio-btn" data-value="islam">Ислам</button>
+        <button class="radio-btn" data-value="buddhism">Буддизм</button>
+        <button class="radio-btn" data-value="other">Другая</button>
+        <button class="radio-btn" data-value="none">Не религиозен(на)</button>
+      </div>
+
+      <label class="field-label">Религия партнёра</label>
+      <div class="radio-group column" id="reg4-religion-partner">
+        <button class="radio-btn" data-value="same">Той же веры что и я</button>
+        <button class="radio-btn" data-value="any_believer">Любой верующий</button>
+        <button class="radio-btn" data-value="doesnt_matter">Не важно</button>
+      </div>
+
+      <label class="field-label">Курение</label>
+      <div class="radio-group" id="reg4-smoking">
+        <button class="radio-btn" data-value="no">Не курю</button>
+        <button class="radio-btn" data-value="yes">Курю</button>
+        <button class="radio-btn" data-value="any">Не важно</button>
+      </div>
+
+      <label class="field-label">Алкоголь</label>
+      <div class="radio-group" id="reg4-alcohol">
+        <button class="radio-btn" data-value="no">Не пью</button>
+        <button class="radio-btn" data-value="rarely">Редко</button>
+        <button class="radio-btn" data-value="any">Не важно</button>
+      </div>
+
+      <div class="nav-row">
+        <button class="btn-secondary" id="btn-reg4-back">← Назад</button>
+        <button class="btn-primary btn-finish" id="btn-reg4-finish">Найти совпадения ✨</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Лента кандидатов -->
+  <section id="screen-feed" class="screen hidden">
+    <div class="feed-header">
+      <div class="feed-title">✨ Душа в душу</div>
+      <button class="icon-btn" id="btn-my-profile">👤</button>
+    </div>
+    <div id="feed-empty" class="feed-empty hidden">
+      <div class="empty-emoji">🌟</div>
+      <h2>Ты один из первых!</h2>
+      <p>Пока кандидатов мало. Пригласи людей из своего окружения — получи 14 дней премиума за каждого</p>
+      <button class="btn-primary" id="btn-invite">Пригласить друга</button>
+    </div>
+    <div id="feed-list" class="feed-list"></div>
+    <div id="feed-loading" class="loading-state hidden">Ищем твоих людей...</div>
+  </section>
+
+  <!-- Профиль кандидата -->
+  <section id="screen-candidate" class="screen hidden">
+    <div class="candidate-header">
+      <button class="back-btn" id="btn-candidate-back">←</button>
+      <div class="candidate-score-badge" id="candidate-score-badge"></div>
+    </div>
+    <div class="candidate-photos" id="candidate-photos"></div>
+    <div class="candidate-info">
+      <div class="candidate-name-row">
+        <h2 id="candidate-name"></h2>
+        <span id="candidate-location"></span>
+      </div>
+      <p id="candidate-about" class="candidate-about"></p>
+      <div class="compatibility-section">
+        <div class="compat-title">Совместимость по системам</div>
+        <div id="compat-breakdown" class="compat-breakdown"></div>
+        <div id="compat-why" class="compat-why hidden"></div>
+      </div>
+    </div>
+    <div class="candidate-actions">
+      <button class="action-btn action-pass" id="btn-pass">✕</button>
+      <button class="action-btn action-super" id="btn-super">⭐</button>
+      <button class="action-btn action-like" id="btn-like">♥</button>
+    </div>
+  </section>
+
+  <!-- Лоадер -->
+  <section id="screen-loading" class="screen loading-screen hidden">
+    <div class="loader-emoji">✨</div>
+    <div class="loader-text">Загружаем...</div>
+  </section>
+
+  <!-- Скрипты -->
+  <script src="js/api.js"></script>
+  <script src="js/state.js"></script>
+  <script src="js/telegram.js"></script>
+  <script src="js/router.js"></script>
+  <script src="js/onboarding.js"></script>
+  <script src="js/registration.js"></script>
+  <script src="js/feed.js"></script>
+  <script src="js/profile.js"></script>
+</body>
+</html>

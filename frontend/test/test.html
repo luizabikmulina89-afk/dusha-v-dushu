@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Тесты — Душа в душу</title>
+  <style>
+    body { font-family: monospace; padding: 20px; background: #f9f9f9; }
+    .pass { color: green; padding: 3px 0; }
+    .fail { color: red; padding: 3px 0; }
+    .group { margin: 16px 0 6px; font-weight: bold; font-size: 15px; border-bottom: 1px solid #ddd; padding-bottom: 4px; }
+    h2 { margin-bottom: 16px; }
+    #summary { margin-top: 20px; font-size: 16px; font-weight: bold; padding: 12px 20px; background: white; border-radius: 8px; display: inline-block; border: 2px solid; }
+  </style>
+</head>
+<body>
+  <h2>Unit тесты — Душа в душу</h2>
+  <div id="results"></div>
+  <div id="summary"></div>
+
+  <!-- Минимальный DOM для router и profile -->
+  <div id="screen-onboarding-1" class="screen" style="display:none"></div>
+  <div id="screen-onboarding-2" class="screen" style="display:none"></div>
+  <div id="screen-onboarding-3" class="screen" style="display:none"></div>
+  <div id="screen-reg-1" class="screen" style="display:none"></div>
+  <div id="screen-feed" class="screen" style="display:none"></div>
+  <div id="screen-candidate" class="screen" style="display:none">
+    <h2 id="candidate-name"></h2>
+    <span id="candidate-location"></span>
+    <p id="candidate-about"></p>
+    <div id="candidate-score-badge"></div>
+    <div id="candidate-photos"></div>
+    <div id="compat-breakdown"></div>
+    <div id="compat-why"></div>
+    <button id="btn-like"></button>
+    <button id="btn-pass"></button>
+    <button id="btn-super"></button>
+    <button id="btn-candidate-back"></button>
+  </div>
+  <div id="feed-list"></div>
+  <div id="feed-empty" style="display:none"></div>
+  <div id="feed-loading" style="display:none"></div>
+
+  <script src="../js/state.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/telegram.js"></script>
+  <script src="../js/router.js"></script>
+  <script src="../js/feed.js"></script>
+  <script src="../js/profile.js"></script>
+  <script src="../js/registration.js"></script>
+
+  <script>
+    let passed = 0, failed = 0;
+    const out = document.getElementById('results');
+
+    function test(name, fn) {
+      try {
+        fn();
+        out.innerHTML += `<div class="pass">✓ ${name}</div>`;
+        passed++;
+      } catch(e) {
+        out.innerHTML += `<div class="fail">✗ ${name}: ${e.message}</div>`;
+        failed++;
+      }
+    }
+
+    function assertEqual(a, b, msg) {
+      if (a !== b) throw new Error(`${msg ? msg + ': ' : ''}ожидали ${JSON.stringify(b)}, получили ${JSON.stringify(a)}`);
+    }
+
+    // === state.js ===
+    out.innerHTML += '<div class="group">state.js</div>';
+
+    test('state.set и state.get работают', () => {
+      state.set('_test_key', 42);
+      assertEqual(state.get('_test_key'), 42);
+    });
+
+    test('state.telegramId сохраняется', () => {
+      state.telegramId = 12345;
+      assertEqual(state.telegramId, 12345);
+      assertEqual(state.isRegistered, true);
+    });
+
+    test('state.onboardingDone сохраняется', () => {
+      state.onboardingDone = true;
+      assertEqual(state.onboardingDone, true);
+    });
+
+    test('state.reg.step1 сохраняет данные', () => {
+      state.reg.step1 = { name: 'Анна', about: 'Люблю кофе' };
+      assertEqual(state.reg.step1.name, 'Анна');
+    });
+
+    // === router.js ===
+    out.innerHTML += '<div class="group">router.js</div>';
+
+    test('router.show переключает текущий экран', () => {
+      router.show('onboarding-1');
+      assertEqual(router.current, 'onboarding-1');
+    });
+
+    test('router.show скрывает предыдущий экран', () => {
+      router.show('onboarding-1');
+      router.show('onboarding-2');
+      const s1 = document.getElementById('screen-onboarding-1');
+      assertEqual(s1.classList.contains('hidden'), true);
+    });
+
+    test('router.show показывает нужный экран', () => {
+      router.show('onboarding-1');
+      const s1 = document.getElementById('screen-onboarding-1');
+      assertEqual(s1.classList.contains('hidden'), false);
+    });
+
+    // === registration.js — валидация ===
+    out.innerHTML += '<div class="group">registration.js — валидация</div>';
+
+    test('validateStep1: пустое имя → false', () => {
+      assertEqual(validateStep1({ name: '', about: '' }), false);
+    });
+
+    test('validateStep1: одна буква → false', () => {
+      assertEqual(validateStep1({ name: 'А', about: '' }), false);
+    });
+
+    test('validateStep1: заполненное имя → true', () => {
+      assertEqual(validateStep1({ name: 'Анна', about: '' }), true);
+    });
+
+    test('validateBirthDate: корректный формат', () => {
+      assertEqual(validateBirthDate('15.03.1990'), true);
+    });
+
+    test('validateBirthDate: неверный формат → false', () => {
+      assertEqual(validateBirthDate('1990-03-15'), false);
+    });
+
+    test('validateBirthDate: пустая строка → false', () => {
+      assertEqual(validateBirthDate(''), false);
+    });
+
+    test('validateAge: 17 лет → false', () => {
+      assertEqual(validateAge(17), false);
+    });
+
+    test('validateAge: 18 лет → true', () => {
+      assertEqual(validateAge(18), true);
+    });
+
+    test('validateAge: 25 лет → true', () => {
+      assertEqual(validateAge(25), true);
+    });
+
+    test('validateAge: 100 лет → false', () => {
+      assertEqual(validateAge(100), false);
+    });
+
+    // === feed.js ===
+    out.innerHTML += '<div class="group">feed.js</div>';
+
+    test('getCompatColor: 82% → green', () => {
+      assertEqual(getCompatColor(82), 'green');
+    });
+
+    test('getCompatColor: 80% → green (граница)', () => {
+      assertEqual(getCompatColor(80), 'green');
+    });
+
+    test('getCompatColor: 70% → yellow', () => {
+      assertEqual(getCompatColor(70), 'yellow');
+    });
+
+    test('getCompatColor: 65% → yellow (граница)', () => {
+      assertEqual(getCompatColor(65), 'yellow');
+    });
+
+    test('getCompatColor: 55% → orange', () => {
+      assertEqual(getCompatColor(55), 'orange');
+    });
+
+    test('buildFeedCard создаёт DOM-элемент', () => {
+      const card = buildFeedCard({
+        user_id: 1, pseudonym: 'Анна', age: 28, city: 'Москва',
+        photos: [], compatibility_score: 85, zodiac_sign: 'Лев', hd_type: 'Генератор'
+      });
+      assertEqual(typeof card.outerHTML, 'string');
+    });
+
+    test('buildFeedCard содержит имя кандидата', () => {
+      const card = buildFeedCard({
+        user_id: 2, pseudonym: 'Мария', age: 30, city: 'СПб',
+        photos: [], compatibility_score: 72, zodiac_sign: null, hd_type: null
+      });
+      assertEqual(card.querySelector('.feed-card-name').textContent, 'Мария, 30');
+    });
+
+    // === profile.js ===
+    out.innerHTML += '<div class="group">profile.js</div>';
+
+    test('buildCompatRow создаёт строку с нужным текстом', () => {
+      const row = buildCompatRow('✨ Нумерология', 85);
+      const nameEl = row.querySelector('.compat-system-name');
+      assertEqual(nameEl.textContent, '✨ Нумерология');
+    });
+
+    test('buildCompatRow: процент отображается', () => {
+      const row = buildCompatRow('🧠 Психотип', 72);
+      const pct = row.querySelector('.compat-row-pct');
+      assertEqual(pct.textContent, '72%');
+    });
+
+    test('buildCompatRow: 82% → класс green', () => {
+      const row = buildCompatRow('Test', 82);
+      const fill = row.querySelector('.compat-bar-fill');
+      assertEqual(fill.classList.contains('green'), true);
+    });
+
+    test('buildCompatRow: 50% → класс orange', () => {
+      const row = buildCompatRow('Test', 50);
+      const fill = row.querySelector('.compat-bar-fill');
+      assertEqual(fill.classList.contains('orange'), true);
+    });
+
+    // === Интеграционные тесты ===
+    out.innerHTML += '<div class="group">Интеграционные тесты</div>';
+
+    test('полный путь state: онбординг → регистрация', () => {
+      localStorage.removeItem('dusha_state');
+      state._data = {};
+      assertEqual(state.isRegistered, false);
+      assertEqual(state.onboardingDone, false);
+      state.onboardingDone = true;
+      assertEqual(state.onboardingDone, true);
+      state.telegramId = 99999;
+      assertEqual(state.isRegistered, true);
+    });
+
+    test('SYSTEM_LABELS содержит все 9 систем', () => {
+      const keys = Object.keys(SYSTEM_LABELS);
+      assertEqual(keys.length, 9);
+    });
+
+    // Финальная очистка
+    localStorage.removeItem('dusha_state');
+
+    const summary = document.getElementById('summary');
+    summary.textContent = `Итого: ${passed} прошло, ${failed} упало`;
+    summary.style.borderColor = failed === 0 ? 'green' : 'red';
+    summary.style.color = failed === 0 ? 'green' : 'red';
+  </script>
+</body>
+</html>
