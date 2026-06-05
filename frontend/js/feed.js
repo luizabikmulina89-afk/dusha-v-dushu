@@ -109,7 +109,7 @@ async function initFeed() {
   if (btnInvite && !btnInvite._listenerAdded) {
     btnInvite._listenerAdded = true;
     btnInvite.addEventListener('click', () => {
-      const link = `https://t.me/DushaVDushuBot?start=ref_${state.telegramId}`;
+      const link = `https://t.me/DushaVDushuApp_bot?start=ref_${state.telegramId}`;
       tg.showAlert(`Твоя реферальная ссылка:\n${link}\n\nПри регистрации твой друг получит 14 дней Premium!`);
     });
   }

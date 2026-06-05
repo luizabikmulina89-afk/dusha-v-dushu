@@ -28,11 +28,12 @@ const tg = {
     this.webapp?.close();
   },
 
-  showAlert(msg) {
+  showAlert(msg, callback) {
     if (this.webapp) {
-      this.webapp.showAlert(msg);
+      this.webapp.showAlert(msg, callback || (() => {}));
     } else {
       alert(msg);
+      if (callback) callback();
     }
   },
 
