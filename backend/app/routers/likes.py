@@ -62,6 +62,26 @@ def send_like(
         match_id = match.id
 
     db.commit()
+
+    # Уведомляем обоих при матче
+    if matched:
+        try:
+            from app.notifications import send_notification
+            send_notification(
+                me.telegram_id,
+                f"💫 Космическое совпадение с {target.pseudonym}!\n"
+                f"Совместимость: {round(match.compatibility_score)}%\n"
+                "Откройте приложение и начните общение!"
+            )
+            send_notification(
+                target.telegram_id,
+                f"💫 Космическое совпадение с {me.pseudonym}!\n"
+                f"Совместимость: {round(match.compatibility_score)}%\n"
+                "Откройте приложение и начните общение!"
+            )
+        except Exception:
+            pass
+
     return {
         "ok": True,
         "matched": matched,

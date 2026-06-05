@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
+from datetime import datetime
 from app.database import get_db
 from app import models
 from app.calculations.compatibility import calculate_compatibility, apply_proximity_factor
@@ -19,6 +20,17 @@ def get_feed(
     me = db.query(models.User).filter(models.User.telegram_id == telegram_id).first()
     if not me or not me.profile:
         return {"candidates": [], "error": "Профиль не заполнен"}
+
+    # Дневной лимит для бесплатных пользователей
+    if not me.is_premium:
+        today = datetime.utcnow().date()
+        if me.daily_views_reset and me.daily_views_reset.date() == today:
+            if me.daily_views_used >= FREE_DAILY_LIMIT:
+                return {"candidates": [], "limit_reached": True, "daily_limit": FREE_DAILY_LIMIT}
+        else:
+            me.daily_views_used = 0
+            me.daily_views_reset = datetime.utcnow()
+            db.commit()
 
     liked_ids = {like.to_user_id for like in me.sent_likes}
 
@@ -68,6 +80,11 @@ def get_feed(
         })
 
     results.sort(key=lambda x: x["compatibility_score"], reverse=True)
+
+    if not me.is_premium:
+        me.daily_views_used = (me.daily_views_used or 0) + len(results[:limit])
+        db.commit()
+
     return {"candidates": results[:limit]}
 
 
