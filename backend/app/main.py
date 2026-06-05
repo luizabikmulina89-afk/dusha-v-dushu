@@ -68,6 +68,17 @@ app.include_router(payments.router)
 def root():
     return {"status": "ok", "app": "Душа в душу"}
 
+@app.get("/debug/paths")
+def debug_paths():
+    import glob
+    frontend_files = glob.glob(str(FRONTEND_DIR / "*"))[:5]
+    return {
+        "file": str(Path(__file__)),
+        "frontend_dir": str(FRONTEND_DIR),
+        "frontend_exists": FRONTEND_DIR.exists(),
+        "frontend_files": frontend_files,
+    }
+
 
 @app.post("/webhook")
 async def telegram_webhook(request: Request):
