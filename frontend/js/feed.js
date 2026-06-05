@@ -70,41 +70,7 @@ async function initFeed() {
 
   if (!list) return;
 
-  list.innerHTML = '';
-  if (loading) loading.classList.remove('hidden');
-  if (empty) empty.classList.add('hidden');
-
-  try {
-    const data = await api.getFeed(telegramId);
-    if (loading) loading.classList.add('hidden');
-
-    if (data.limit_reached) {
-      showLimitBanner(list, data.daily_limit);
-      if (loading) loading.classList.add('hidden');
-      return;
-    }
-
-    if (!data.candidates || data.candidates.length === 0) {
-      if (empty) empty.classList.remove('hidden');
-      return;
-    }
-
-    data.candidates.forEach(candidate => {
-      list.appendChild(buildFeedCard(candidate));
-    });
-
-  } catch (err) {
-    if (loading) loading.classList.add('hidden');
-    console.warn('Feed error:', err.message);
-
-    const mockCandidates = [
-      { user_id: 1, pseudonym: 'Анна', age: 29, city: 'Москва', photos: [], compatibility_score: 87, zodiac_sign: 'Лев', hd_type: 'Генератор' },
-      { user_id: 2, pseudonym: 'Мария', age: 31, city: 'Москва', photos: [], compatibility_score: 74, zodiac_sign: 'Рыбы', hd_type: 'Проектор' },
-      { user_id: 3, pseudonym: 'Елена', age: 27, city: 'СПб', photos: [], compatibility_score: 62, zodiac_sign: 'Скорпион', hd_type: 'Манифестор' },
-    ];
-    mockCandidates.forEach(c => list.appendChild(buildFeedCard(c)));
-  }
-
+  // Навешиваем обработчики сразу — до любых return
   const btnInvite = document.getElementById('btn-invite');
   if (btnInvite && !btnInvite._listenerAdded) {
     btnInvite._listenerAdded = true;
@@ -129,6 +95,40 @@ async function initFeed() {
       router.show('matches');
       initMatches();
     });
+  }
+
+  list.innerHTML = '';
+  if (loading) loading.classList.remove('hidden');
+  if (empty) empty.classList.add('hidden');
+
+  try {
+    const data = await api.getFeed(telegramId);
+    if (loading) loading.classList.add('hidden');
+
+    if (data.limit_reached) {
+      showLimitBanner(list, data.daily_limit);
+      return;
+    }
+
+    if (!data.candidates || data.candidates.length === 0) {
+      if (empty) empty.classList.remove('hidden');
+      return;
+    }
+
+    data.candidates.forEach(candidate => {
+      list.appendChild(buildFeedCard(candidate));
+    });
+
+  } catch (err) {
+    if (loading) loading.classList.add('hidden');
+    console.warn('Feed error:', err.message);
+
+    const mockCandidates = [
+      { user_id: 1, pseudonym: 'Анна', age: 29, city: 'Москва', photos: [], compatibility_score: 87, zodiac_sign: 'Лев', hd_type: 'Генератор' },
+      { user_id: 2, pseudonym: 'Мария', age: 31, city: 'Москва', photos: [], compatibility_score: 74, zodiac_sign: 'Рыбы', hd_type: 'Проектор' },
+      { user_id: 3, pseudonym: 'Елена', age: 27, city: 'СПб', photos: [], compatibility_score: 62, zodiac_sign: 'Скорпион', hd_type: 'Манифестор' },
+    ];
+    mockCandidates.forEach(c => list.appendChild(buildFeedCard(c)));
   }
 }
 
