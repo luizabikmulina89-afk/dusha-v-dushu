@@ -40,12 +40,6 @@ async def lifespan(app: FastAPI):
 
     yield
 
-    if _bot:
-        try:
-            await _bot.delete_webhook()
-        except Exception:
-            pass
-
 
 app = FastAPI(title="Душа в душу API", version="1.0.0", lifespan=lifespan)
 
