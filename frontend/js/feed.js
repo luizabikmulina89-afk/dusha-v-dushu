@@ -1,3 +1,18 @@
+function showLimitBanner(list, limit) {
+  const banner = document.createElement('div');
+  banner.className = 'feed-limit-banner';
+  banner.innerHTML = `
+    <div class="feed-limit-text">
+      <strong>Лимит ${limit} анкет/день исчерпан</strong><br>
+      С Premium — безлимитные просмотры каждый день
+    </div>
+    <button class="btn-get-premium" id="btn-go-premium">Premium ⭐</button>
+  `;
+  list.appendChild(banner);
+  const btn = banner.querySelector('#btn-go-premium');
+  if (btn) btn.onclick = () => showPremiumScreen();
+}
+
 function getCompatColor(pct) {
   if (pct >= 80) return 'green';
   if (pct >= 65) return 'yellow';
@@ -62,6 +77,12 @@ async function initFeed() {
   try {
     const data = await api.getFeed(telegramId);
     if (loading) loading.classList.add('hidden');
+
+    if (data.limit_reached) {
+      showLimitBanner(list, data.daily_limit);
+      if (loading) loading.classList.add('hidden');
+      return;
+    }
 
     if (!data.candidates || data.candidates.length === 0) {
       if (empty) empty.classList.remove('hidden');

@@ -104,17 +104,28 @@ def get_matches(telegram_id: int, db: Session = Depends(get_db)):
     for match in matches:
         partner_id = match.user2_id if match.user1_id == me.id else match.user1_id
         partner = db.query(models.User).filter(models.User.id == partner_id).first()
-        if partner:
-            result.append({
-                "match_id": match.id,
-                "partner_id": partner.id,
-                "pseudonym": partner.pseudonym,
-                "age": partner.age,
-                "city": partner.city,
-                "photos": partner.photos,
-                "compatibility_score": match.compatibility_score,
-                "created_at": match.created_at.isoformat(),
-            })
+        if not partner:
+            continue
+
+        last_msg = (
+            db.query(models.Message)
+            .filter(models.Message.match_id == match.id)
+            .order_by(models.Message.created_at.desc())
+            .first()
+        )
+
+        result.append({
+            "match_id": match.id,
+            "partner_id": partner.id,
+            "pseudonym": partner.pseudonym,
+            "age": partner.age,
+            "city": partner.city,
+            "photos": partner.photos,
+            "compatibility_score": match.compatibility_score,
+            "last_message": last_msg.text if last_msg else None,
+            "expires_at": match.expires_at.isoformat() if match.expires_at else None,
+            "created_at": match.created_at.isoformat(),
+        })
 
     return {"matches": result}
 
