@@ -231,6 +231,7 @@
   <section id="screen-feed" class="screen hidden">
     <div class="feed-header">
       <div class="feed-title">✨ Душа в душу</div>
+      <button class="icon-btn" id="btn-matches-nav">💫</button>
       <button class="icon-btn" id="btn-my-profile">👤</button>
     </div>
     <div id="feed-empty" class="feed-empty hidden">
@@ -269,6 +270,42 @@
     </div>
   </section>
 
+  <!-- Список совпадений -->
+  <section id="screen-matches" class="screen hidden">
+    <div class="matches-header">
+      <button class="back-btn" id="btn-matches-back">←</button>
+      <div class="matches-title">💫 Мои совпадения</div>
+    </div>
+    <div id="matches-loading" class="loading-state hidden">Загружаем...</div>
+    <div id="matches-empty" class="feed-empty hidden">
+      <div class="empty-emoji">💫</div>
+      <h2>Совпадений пока нет</h2>
+      <p>Лайкай людей в ленте — когда они ответят взаимностью, они появятся здесь</p>
+    </div>
+    <div id="matches-list" class="matches-list"></div>
+  </section>
+
+  <!-- Чат -->
+  <section id="screen-chat" class="screen hidden">
+    <div class="chat-header">
+      <button class="back-btn" id="btn-chat-back">←</button>
+      <div id="chat-partner-name" class="chat-partner-name"></div>
+      <div id="chat-compat-badge" class="chat-compat-badge"></div>
+    </div>
+    <div id="chat-messages" class="chat-messages"></div>
+    <div id="chat-expiry-note" class="chat-expiry-note hidden"></div>
+    <div class="chat-input-row">
+      <input
+        type="text"
+        id="chat-input"
+        class="chat-input"
+        placeholder="Напиши что-нибудь..."
+        maxlength="2000"
+      >
+      <button class="chat-send-btn" id="btn-send-message">→</button>
+    </div>
+  </section>
+
   <!-- Лоадер -->
   <section id="screen-loading" class="screen loading-screen hidden">
     <div class="loader-emoji">✨</div>
@@ -284,5 +321,8 @@
   <script src="js/registration.js"></script>
   <script src="js/feed.js"></script>
   <script src="js/profile.js"></script>
+  <script src="js/matches.js"></script>
+  <script src="js/chat.js"></script>
+  <script src="js/premium.js"></script>
 </body>
 </html>

@@ -100,6 +100,15 @@ async function initFeed() {
       tg.showAlert('Профиль — в следующем обновлении!');
     });
   }
+
+  const btnMatchesNav = document.getElementById('btn-matches-nav');
+  if (btnMatchesNav && !btnMatchesNav._listenerAdded) {
+    btnMatchesNav._listenerAdded = true;
+    btnMatchesNav.addEventListener('click', () => {
+      router.show('matches');
+      initMatches();
+    });
+  }
 }
 
 document.addEventListener('DOMContentLoaded', () => {

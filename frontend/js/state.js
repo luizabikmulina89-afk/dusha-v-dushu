@@ -31,6 +31,9 @@ const state = {
   get currentCandidate() { return this.get('current_candidate'); },
   set currentCandidate(v) { this.set('current_candidate', v); },
 
+  get currentMatch() { return this.get('current_match'); },
+  set currentMatch(v) { this.set('current_match', v); },
+
   showError(msg) {
     alert(msg);
   },

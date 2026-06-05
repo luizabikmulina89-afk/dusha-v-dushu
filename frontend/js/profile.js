@@ -80,7 +80,20 @@ function initCandidateProfile() {
       try {
         const result = await api.sendLike(state.telegramId || tg.userId, candidate.user_id, false);
         if (result.matched) {
-          tg.showAlert(`💫 Космическое совпадение с ${candidate.pseudonym}!\n\nСовместимость: ${candidate.compatibility_score}%\n\nОткройте чат и напишите первым!`);
+          tg.hapticSuccess();
+          state.currentMatch = {
+            match_id: result.match_id,
+            pseudonym: candidate.pseudonym,
+            age: candidate.age,
+            city: candidate.city,
+            photos: candidate.photos || [],
+            compatibility_score: candidate.compatibility_score,
+          };
+          tg.showAlert(
+            `💫 Космическое совпадение с ${candidate.pseudonym}!\n\n` +
+            `Совместимость: ${candidate.compatibility_score}%\n\n` +
+            `Нажмите 💫 в ленте, чтобы начать общение!`
+          );
         } else {
           tg.showAlert('Лайк отправлен! ♥');
         }

@@ -45,4 +45,16 @@ const api = {
   getMatches(telegramId) {
     return this.request('GET', `/likes/${telegramId}/matches`);
   },
+
+  getMessages(matchId, telegramId) {
+    return this.request('GET', `/chat/${matchId}?telegram_id=${telegramId}`);
+  },
+
+  sendMessage(matchId, telegramId, text) {
+    return this.request('POST', `/chat/${matchId}/send?telegram_id=${telegramId}`, { text });
+  },
+
+  createInvoice(telegramId) {
+    return this.request('POST', `/payments/create-invoice/${telegramId}`);
+  },
 };
