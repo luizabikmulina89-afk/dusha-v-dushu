@@ -75,8 +75,14 @@ async function initFeed() {
   if (btnInvite && !btnInvite._listenerAdded) {
     btnInvite._listenerAdded = true;
     btnInvite.addEventListener('click', () => {
-      const link = `https://t.me/DushaVDushuApp_bot?start=ref_${state.telegramId}`;
-      tg.showAlert(`Твоя реферальная ссылка:\n${link}\n\nПри регистрации твой друг получит 14 дней Premium!`);
+      const userId = state.telegramId || tg.userId;
+      const link = `https://t.me/DushaVDushuApp_bot?start=ref_${userId}`;
+      // Открываем ссылку напрямую — надёжнее чем showAlert
+      if (tg.webapp && tg.webapp.openTelegramLink) {
+        tg.webapp.openTelegramLink(link);
+      } else {
+        window.open(link, '_blank');
+      }
     });
   }
 
@@ -84,7 +90,7 @@ async function initFeed() {
   if (btnProfile && !btnProfile._listenerAdded) {
     btnProfile._listenerAdded = true;
     btnProfile.addEventListener('click', () => {
-      tg.showAlert('Профиль — в следующем обновлении!');
+      alert('Профиль — в следующем обновлении!');
     });
   }
 
