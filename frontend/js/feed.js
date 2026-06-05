@@ -76,12 +76,13 @@ async function initFeed() {
     btnInvite._listenerAdded = true;
     btnInvite.addEventListener('click', () => {
       const userId = state.telegramId || tg.userId;
-      const link = `https://t.me/DushaVDushuApp_bot?start=ref_${userId}`;
-      // Открываем ссылку напрямую — надёжнее чем showAlert
+      const inviteLink = `https://t.me/DushaVDushuApp_bot?start=ref_${userId}`;
+      const text = 'Заходи в «Душа в душу» — найдём твоего человека по нумерологии и астрологии! 💫';
+      const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(inviteLink)}&text=${encodeURIComponent(text)}`;
       if (tg.webapp && tg.webapp.openTelegramLink) {
-        tg.webapp.openTelegramLink(link);
+        tg.webapp.openTelegramLink(shareUrl);
       } else {
-        window.open(link, '_blank');
+        window.open(shareUrl, '_blank');
       }
     });
   }
