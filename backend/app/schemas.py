@@ -60,3 +60,6 @@ class ProfileResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+class MessageSend(BaseModel):
+    text: str = Field(min_length=1, max_length=2000)

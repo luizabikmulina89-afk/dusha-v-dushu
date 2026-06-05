@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from app.database import engine, Base
 from app import models  # noqa: F401
-from app.routers import users, feed, likes
+from app.routers import users, feed, likes, chat
 
 app = FastAPI(title="Душа в душу API", version="1.0.0")
 Base.metadata.create_all(bind=engine)
@@ -9,6 +9,7 @@ Base.metadata.create_all(bind=engine)
 app.include_router(users.router)
 app.include_router(feed.router)
 app.include_router(likes.router)
+app.include_router(chat.router)
 
 @app.get("/")
 def root():
