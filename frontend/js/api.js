@@ -1,4 +1,8 @@
-const API_BASE = 'http://127.0.0.1:8000';
+// Локально (открыть напрямую в браузере): обращаемся к localhost:8000
+// На Railway (фронтенд раздаёт сам FastAPI): используем тот же origin
+const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+  ? 'http://127.0.0.1:8000'
+  : window.location.origin;
 
 const api = {
   async request(method, path, body) {
