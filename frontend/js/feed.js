@@ -74,15 +74,14 @@ async function initFeed() {
   const btnInvite = document.getElementById('btn-invite');
   if (btnInvite && !btnInvite._listenerAdded) {
     btnInvite._listenerAdded = true;
-    btnInvite.addEventListener('click', () => {
+    btnInvite.addEventListener('click', async () => {
       const userId = state.telegramId || tg.userId;
       const inviteLink = `https://t.me/DushaVDushuApp_bot?start=ref_${userId}`;
-      const text = 'Заходи в «Душа в душу» — найдём твоего человека по нумерологии и астрологии! 💫';
-      const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(inviteLink)}&text=${encodeURIComponent(text)}`;
-      if (tg.webapp && tg.webapp.openTelegramLink) {
-        tg.webapp.openTelegramLink(shareUrl);
-      } else {
-        window.open(shareUrl, '_blank');
+      try {
+        await navigator.clipboard.writeText(inviteLink);
+        tg.showAlert('Ссылка скопирована! Отправь её другу в Telegram 💫');
+      } catch (e) {
+        tg.showAlert('Твоя ссылка для друга:\n' + inviteLink);
       }
     });
   }
